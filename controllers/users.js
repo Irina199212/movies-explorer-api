@@ -11,8 +11,6 @@ const TokenError = require('../errors/token');
 module.exports.createUser = (req, res, next) => {
   const {
     name,
-    about,
-    avatar,
     email,
     password,
   } = req.body;
@@ -22,8 +20,6 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create(
       {
         name,
-        about,
-        avatar,
         email,
         password: hash,
       },
@@ -32,8 +28,6 @@ module.exports.createUser = (req, res, next) => {
       res.send({
         data: {
           name: user.name,
-          about: user.about,
-          avatar: user.avatar,
           email: user.email,
           _id: user._id,
         },
@@ -80,60 +74,12 @@ module.exports.getCurrentUser = (req, res, next) => {
     });
 };
 
-module.exports.getUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      next(err);
-    });
-};
-
-module.exports.getUser = (req, res, next) => {
-  User.findById(req.params.userId)
-    .orFail(() => {
-      throw new NotFoundError('Пользователь по указанному _id не найден');
-    })
-    .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new ValidationError('По указанному _id ничего не найдено'));
-      } else {
-        next(err);
-      }
-    });
-};
-
 module.exports.updateUser = (req, res, next) => {
-  const { name, about } = req.body;
+  const { name, email } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
-    {
-      new: true,
-      runValidators: true,
-      upsert: false,
-    },
-  )
-    .orFail(() => {
-      throw new NotFoundError('Пользователь по указанному _id не найден');
-    })
-    .then((userData) => res.send({ data: userData }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ValidationError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
-      } else {
-        next(err);
-      }
-    });
-};
-
-module.exports.updateUserAvater = (req, res, next) => {
-  const { avatar } = req.body;
-
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
+    { name, email },
     {
       new: true,
       runValidators: true,

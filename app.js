@@ -11,8 +11,6 @@ const auth = require('./middlewares/auth');
 const errorsContainer = require('./middlewares/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const patternurl = require('./helpers/helper');
-
 const app = express();
 
 app.use(cors());
@@ -26,24 +24,15 @@ mongoose.connect(DB, {
   useUnifiedTopology: true,
 });
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
-
 app.post(
   '/signup',
   celebrate({
     body: Joi.object()
       .keys({
         name: Joi.string().min(2).max(30),
-        about: Joi.string().min(2).max(30),
         email: Joi.string().required().email(),
-        avatar: Joi.string().pattern(new RegExp(patternurl)),
         password: Joi.string().required(),
-      })
-      .unknown(true),
+      }),
   }),
   createUser,
 );
@@ -58,7 +47,7 @@ app.post('/signin', celebrate({
 app.use(auth);
 
 app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.use('/movies', require('./routes/movies'));
 
 app.use((req, res, next) => {
   next(new NotFoundError('Маршрут не найден'));
