@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const patternurl = require('../helpers/helper');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -28,7 +27,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        return validator.matches(v, patternurl);
+        return validator.isURL(v);
       },
       message: 'Поле "image" должно быть ссылкой',
     },
@@ -38,7 +37,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        return validator.matches(v, patternurl);
+        return validator.isURL(v);
       },
       message: 'Поле "trailerLink" должно быть ссылкой',
     },
@@ -48,17 +47,18 @@ const movieSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        return validator.matches(v, patternurl);
+        return validator.isURL(v);
       },
       message: 'Поле "thumbnail" должно быть ссылкой',
     },
   },
   owner: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
   movieId: {
-    type: String,
+    type: Number,
     required: true,
   },
   nameRU: {

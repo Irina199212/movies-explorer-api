@@ -49,7 +49,7 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email })
     .select('+password')
     .orFail(() => {
-      throw new TokenError('Пользователь по указанному _id не найден');
+      throw new TokenError('Неверный email или пароль');
     })
     .then((user) => bcrypt.compare(password, user.password).then((matched) => { if (!matched) { return Promise.reject(new TokenError('Неправильные почта или пароль')); } return user; }))
     .then((user) => {
@@ -91,7 +91,9 @@ module.exports.updateUser = (req, res, next) => {
     })
     .then((userData) => res.send({ data: userData }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.code === 11000) {
+        next(new RegisterError('Пользователь с указанным email уже существует'));
+      } else if (err.name === 'ValidationError') {
         next(new ValidationError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
       } else {
         next(err);

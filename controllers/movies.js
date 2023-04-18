@@ -56,8 +56,8 @@ module.exports.deleteMovie = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundError('Фильм с указанным _id не найден');
     })
-    .then((card) => {
-      if (card.owner.toString() !== req.user._id) {
+    .then((movie) => {
+      if (movie.owner.toString() !== req.user._id) {
         throw new AccessError('Доступ запрещен');
       }
 

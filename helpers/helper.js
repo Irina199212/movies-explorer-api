@@ -1,4 +1,8 @@
-/* eslint-disable-next-line */
-const patternurl = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
+const validator = require('validator');
+const ValidationError = require('../errors/validation');
 
-module.exports = patternurl;
+module.exports.checkUrl = (value) => {
+  if (!validator.isURL(value)) throw new ValidationError('Неправильный URL');
+
+  return value;
+};
